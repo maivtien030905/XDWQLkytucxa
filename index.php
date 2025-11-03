@@ -1,7 +1,14 @@
 <?php
+session_start();
 include 'db.php';
 
-// Lấy danh sách phòng + số sinh viên đang ở
+// 🧩 Kiểm tra nếu chưa đăng nhập thì quay lại trang login
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// 🧩 Lấy danh sách phòng + số sinh viên đang ở
 $sql = "
     SELECT 
         phong.id,
@@ -26,14 +33,26 @@ $result = $conn->query($sql);
 </head>
 <body class="bg-light">
 
-<div class="container mt-5">
-    <h2 class="mb-4 text-center text-primary">Danh sách phòng ký túc xá</h2>
+<div class="container mt-4">
 
+    <!-- 🧭 Thanh điều hướng trên cùng -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary">🏠 Quản lý ký túc xá</h3>
+        <div>
+            <span class="me-3 text-secondary">
+                Xin chào, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>
+            </span>
+            <a href="logout.php" class="btn btn-outline-danger btn-sm">Đăng xuất</a>
+        </div>
+    </div>
+
+    <!-- 🧩 Các nút thao tác -->
     <div class="mb-3 text-end">
         <a href="phong_them.php" class="btn btn-success btn-sm">+ Thêm phòng</a>
         <a href="hopdong_them.php" class="btn btn-info btn-sm">+ Thêm sinh viên vào phòng</a>
     </div>
 
+    <!-- 🧱 Bảng hiển thị dữ liệu phòng -->
     <table class="table table-bordered table-hover text-center shadow">
         <thead class="table-primary">
             <tr>
