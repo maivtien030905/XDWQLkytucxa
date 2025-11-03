@@ -1,0 +1,15 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+table {
+    border-radius: 10px;
+    overflow: hidden;
+}
