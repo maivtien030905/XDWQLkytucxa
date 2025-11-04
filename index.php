@@ -12,14 +12,14 @@ if (!isset($_SESSION['username'])) {
 $sql = "
     SELECT 
         phong.id,
-        phong.ten_phong,
-        phong.so_nguoi_toi_da,
-        phong.gia_thue,
+        phong.tenphong,
+        phong.songuoitoida,
+        phong.giathue,
         COUNT(hopdong.id) AS so_sinhvien,
-        (phong.so_nguoi_toi_da - COUNT(hopdong.id)) AS so_con_trong
+        (phong.songuoitoida - COUNT(hopdong.id)) AS so_con_trong
     FROM phong
     LEFT JOIN hopdong ON phong.id = hopdong.phongid
-    GROUP BY phong.id
+    GROUP BY phong.id, phong.tenphong, phong.songuoitoida, phong.giathue
 ";
 $result = $conn->query($sql);
 ?>
@@ -70,16 +70,19 @@ $result = $conn->query($sql);
                 <?php while ($row = $result->fetch_assoc()) : ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
-                        <td><?= htmlspecialchars($row['ten_phong']) ?></td>
-                        <td><?= $row['so_nguoi_toi_da'] ?></td>
-                        <td><?= number_format($row['gia_thue'], 0, ',', '.') ?></td>
+                        <td><?= htmlspecialchars($row['tenphong']) ?></td>
+                        <td><?= $row['songuoitoida'] ?></td>
+                        <td><?= number_format($row['giathue'], 0, ',', '.') ?></td>
                         <td><?= $row['so_sinhvien'] ?></td>
                         <td class="<?= ($row['so_con_trong'] > 0) ? 'text-success' : 'text-danger' ?>">
                             <?= $row['so_con_trong'] ?>
                         </td>
                         <td>
+                            <a href="phong_chitiet.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">
+                                👁️ Xem chi tiết
+                            </a>
                             <a href="phong_xoa.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm"
-                               onclick="return confirm('Bạn có chắc muốn xóa phòng này không?')">Xóa</a>
+                               onclick="return confirm('Bạn có chắc muốn xóa phòng này không?')">🗑️ Xóa</a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

@@ -1,30 +1,30 @@
 <?php
+session_start();
 include 'db.php';
 
-// Khi người dùng bấm nút "Thêm phòng"
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Lấy dữ liệu từ form
-    $tenphong = $_POST['tenphong'] ?? '';
-    $songuoitoida = $_POST['songuoitoida'] ?? 0;
-    $giathue = $_POST['giathue'] ?? 0;
+// 🧩 Kiểm tra nếu chưa đăng nhập thì quay lại trang login
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
 
-    // Kiểm tra dữ liệu hợp lệ
-    if (!empty($tenphong) && $songuoitoida > 0 && $giathue > 0) {
-        // Truy vấn INSERT đúng tên cột
-        $sql = "INSERT INTO phong (tenphong, songuoitoida, giathue) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sii", $tenphong, $songuoitoida, $giathue);
+// 🧩 Khi người dùng gửi form
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $tenphong = $_POST['tenphong'];
+    $songuoitoida = $_POST['songuoitoida'];
+    $giathue = $_POST['giathue'];
 
-        if ($stmt->execute()) {
-            echo "<script>
-                alert('✅ Thêm phòng thành công!');
-                window.location = 'index.php';
-            </script>";
+    if (!empty($tenphong) && !empty($songuoitoida) && !empty($giathue)) {
+        $sql = "INSERT INTO phong (tenphong, songuoitoida, giathue)
+                VALUES ('$tenphong', '$songuoitoida', '$giathue')";
+        if ($conn->query($sql)) {
+            header("Location: index.php");
+            exit();
         } else {
-            echo "<div class='alert alert-danger'>Lỗi khi thêm: " . $conn->error . "</div>";
+            echo "<div class='alert alert-danger mt-3'>❌ Lỗi SQL: " . $conn->error . "</div>";
         }
     } else {
-        echo "<div class='alert alert-warning'>⚠️ Vui lòng nhập đầy đủ thông tin hợp lệ!</div>";
+        echo "<div class='alert alert-warning mt-3'>⚠️ Vui lòng nhập đầy đủ thông tin!</div>";
     }
 }
 ?>
@@ -37,30 +37,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
-
-<div class="container mt-5">
-    <h2 class="mb-4 text-center text-primary">Thêm phòng ký túc xá</h2>
-
-    <form method="POST" class="p-4 bg-white rounded shadow-sm">
+<div class="container mt-4">
+    <h3 class="mb-3 text-primary">🟩 Thêm phòng mới</h3>
+    <form method="POST">
         <div class="mb-3">
             <label class="form-label">Tên phòng</label>
             <input type="text" name="tenphong" class="form-control" required>
         </div>
-
         <div class="mb-3">
             <label class="form-label">Số người tối đa</label>
-            <input type="number" name="songuoitoida" class="form-control" min="1" required>
+            <input type="number" name="songuoitoida" class="form-control" required>
         </div>
-
         <div class="mb-3">
             <label class="form-label">Giá thuê (VNĐ)</label>
-            <input type="number" name="giathue" class="form-control" min="0" required>
+            <input type="number" name="giathue" class="form-control" required>
         </div>
-
-        <button type="submit" class="btn btn-success">Thêm phòng</button>
+        <button type="submit" class="btn btn-success">Lưu phòng</button>
         <a href="index.php" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>
-
 </body>
 </html>
