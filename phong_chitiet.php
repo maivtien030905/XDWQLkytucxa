@@ -35,6 +35,8 @@ $result_sv = $conn->query($sql_sv);
     <meta charset="UTF-8">
     <title>Chi tiết phòng <?= htmlspecialchars($phong['tenphong']) ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body class="bg-light">
 <div class="container mt-5">

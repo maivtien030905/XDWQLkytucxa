@@ -1,15 +1,51 @@
+/* 🏙️ Toàn bộ nền trang */
 body {
     font-family: "Segoe UI", sans-serif;
+    background: url('uploads/background.png') no-repeat center center fixed;
+    background-size: cover; /* Ảnh phủ toàn màn hình */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
 }
 
+/* 🌫️ Lớp mờ phủ lên nền để chữ dễ đọc */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(6px);
+    z-index: -1;
+}
+
+
+/* 📦 Container nổi lên trên nền */
 .container {
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 25px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    margin-top: 30px;
 }
 
+/* 🧱 Bảng dữ liệu */
 table {
     border-radius: 10px;
     overflow: hidden;
+    background-color: #fff;
+}
+
+/* 🌈 Tiêu đề bảng */
+.table-primary th {
+    background-color: #007bff !important;
+    color: white;
+}
+
+/* ✨ Hiệu ứng hover */
+table tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transition: 0.3s;
 }
