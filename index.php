@@ -1,110 +1,66 @@
 <?php
 session_start();
 include 'db.php';
-
-// 🧩 Kiểm tra nếu chưa đăng nhập thì quay lại trang login
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit();
 }
-
-// 🧩 Lấy danh sách phòng + số sinh viên đang ở
-$sql = "
-    SELECT 
-        phong.id,
-        phong.tenphong,
-        phong.songuoitoida,
-        phong.giathue,
-        COUNT(hopdong.id) AS so_sinhvien,
-        (phong.songuoitoida - COUNT(hopdong.id)) AS so_con_trong
-    FROM phong
-    LEFT JOIN hopdong ON phong.id = hopdong.phongid
-    GROUP BY phong.id, phong.tenphong, phong.songuoitoida, phong.giathue
-";
-$result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý ký túc xá</title>
+    <title>Hệ thống quản lý ký túc xá DNU</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-<div class="container mt-4 shadow-lg">
+<div class="layout">
 
-    <!-- 🧭 Thanh điều hướng -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="text-primary fw-bold">🏠 Quản lý ký túc xá</h3>
-        <div>
-            <span class="me-3 text-secondary">
-                Xin chào, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>
-            </span>
-            <a href="logout.php" class="btn btn-outline-danger btn-sm">Đăng xuất</a>
+    <!-- 🌐 Sidebar cố định -->
+    <div class="sidebar">
+        <h3>🏫 KTX DNU</h3>
+        <ul>
+            <li><a href="#" onclick="loadPage('phong.php')" class="active">📋 Danh sách phòng</a></li>
+            <li><a href="#" onclick="loadPage('hopdong_them.php')">🧍 Thêm sinh viên</a></li>
+            <li><a href="#" onclick="loadPage('hopdong_danhsach.php')">🧾 Danh sách hợp đồng</a></li>
+            <li><a href="#" onclick="loadPage('lichsu_doi_phong.php')">📜 Lịch sử đổi phòng</a></li>
+            <li><a href="#" onclick="loadPage('phong_them.php')">➕ Thêm phòng</a></li>
+            <li><a href="thongke.php">📊 Thống kê điện nước</a></li>
+            <li><a href="logout.php" class="logout">🚪 Đăng xuất</a></li>
+        </ul>
+    </div>
+
+    <!-- 🧱 Khu vực nội dung thay đổi -->
+    <div class="content" id="content-area">
+        <div class="welcome">
+            <h2>🎓 Chào mừng <?= htmlspecialchars($_SESSION['username']) ?></h2>
+            <p>Hệ thống quản lý ký túc xá DNU</p>
         </div>
     </div>
 
-    <!-- 🧩 Các nút thao tác -->
-    <div class="mb-3 text-end">
-        <a href="phong_them.php" class="btn btn-success btn-sm">+ Thêm phòng</a>
-        <a href="hopdong_them.php" class="btn btn-info btn-sm">+ Thêm sinh viên vào phòng</a>
-        <a href="hopdong_danhsach.php" class="btn btn-warning btn-sm">📋 Xem danh sách hợp đồng</a>
-    </div>
-
-    <!-- 🧱 Bảng hiển thị dữ liệu -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover text-center align-middle shadow-sm">
-            <thead class="table-primary">
-                <tr>
-                    <th>ID</th>
-                    <th>Tên phòng</th>
-                    <th>Số người tối đa</th>
-                    <th>Giá thuê (VNĐ)</th>
-                    <th>Đang ở</th>
-                    <th>Còn trống</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($result && $result->num_rows > 0) : ?>
-                    <?php while ($row = $result->fetch_assoc()) : ?>
-                        <tr>
-                            <td><?= $row['id'] ?></td>
-                            <td class="fw-semibold"><?= htmlspecialchars($row['tenphong']) ?></td>
-                            <td><?= $row['songuoitoida'] ?></td>
-                            <td><?= number_format($row['giathue'], 0, ',', '.') ?></td>
-                            <td><?= $row['so_sinhvien'] ?></td>
-                            <td class="<?= ($row['so_con_trong'] > 0) ? 'text-success fw-bold' : 'text-danger fw-bold' ?>">
-                                <?= $row['so_con_trong'] ?>
-                            </td>
-                            <td>
-                                <a href="phong_chitiet.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm">
-                                    👁️ Xem
-                                </a>
-                                <a href="phong_sua.php?id=<?= $row['id'] ?>" class="btn btn-warning btn-sm">
-                                    ✏️ Sửa
-                                </a>
-                                <a href="phong_xoa.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Bạn có chắc muốn xóa phòng này không?')">
-                                   🗑️ Xóa
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else : ?>
-                    <tr>
-                        <td colspan="7" class="text-muted py-3">
-                            🚪 Chưa có dữ liệu phòng nào!
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
 </div>
+
+<!-- ⚙️ JavaScript để load nội dung động -->
+<script>
+function loadPage(page) {
+    const area = document.getElementById('content-area');
+    area.innerHTML = '<div class="loading">⏳ Đang tải...</div>';
+    fetch(page)
+        .then(res => res.text())
+        .then(data => {
+            area.innerHTML = data;
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.sidebar a[onclick="loadPage('${page}')"]`).classList.add('active');
+        })
+        .catch(err => {
+            area.innerHTML = "<p class='text-danger'>⚠️ Lỗi khi tải trang!</p>";
+            console.error(err);
+        });
+}
+</script>
 
 </body>
 </html>

@@ -41,7 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ngayketthuc = '$ngayketthuc'
         WHERE id = $id
     ";
+// Sau khi cập nhật hợp đồng thành công:
+if ($update_success) {
+    // Lấy thông tin sinh viên và phòng
+    $sinhvien_id = $row['sinhvien_id'];
+    $ten_sinhvien = $row['ten_sinhvien'];
+    $phong_cu = $row['phong_cu'];
+    $phong_moi = $row['phong_moi'];
 
+    // Thêm vào lịch sử
+    $sql_history = "INSERT INTO lichsu_doi_phong (sinhvien_id, ten_sinhvien, phong_cu, phong_moi, ghichu)
+                    VALUES ('$sinhvien_id', '$ten_sinhvien', '$phong_cu', '$phong_moi', 'Đổi phòng theo yêu cầu')";
+    $conn->query($sql_history);
+}
     if ($conn->query($update_sql) === TRUE) {
         echo "<script>alert('✅ Cập nhật hợp đồng thành công!'); window.location='hopdong_danhsach.php';</script>";
     } else {

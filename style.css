@@ -1,14 +1,14 @@
-/* 🏙️ Toàn bộ nền trang */
+/* 🌈 Font và nền */
 body {
-    font-family: "Segoe UI", sans-serif;
+    font-family: 'Inter', sans-serif;
     background: url('uploads/background.png') no-repeat center center fixed;
-    background-size: cover; /* Ảnh phủ toàn màn hình */
+    background-size: cover;
     margin: 0;
     padding: 0;
     min-height: 100vh;
 }
 
-/* 🌫️ Lớp mờ phủ lên nền để chữ dễ đọc */
+/* 🌫️ Lớp phủ mờ */
 body::before {
     content: "";
     position: fixed;
@@ -16,36 +16,131 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(6px);
+    background-color: rgba(255,255,255,0.75);
     z-index: -1;
 }
 
-
-/* 📦 Container nổi lên trên nền */
-.container {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
-    margin-top: 30px;
+/* 📐 Layout tổng thể */
+.layout {
+    display: flex;
+    height: 100vh;
 }
 
-/* 🧱 Bảng dữ liệu */
-table {
+/* 🧭 Sidebar cố định bên trái */
+.sidebar {
+    width: 240px;
+    background-color: #0056A1;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🏫 Logo */
+.sidebar h3 {
+    text-align: center;
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+/* 🔗 Menu chức năng */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar ul li {
+    margin-bottom: 8px;
+}
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background-color: #004080;
+    transform: translateX(5px);
+}
+.sidebar ul li a span.icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+/* 🚪 Nút đăng xuất */
+.sidebar .logout {
+    background-color: #d9534f;
+    text-align: center;
+    padding: 12px;
+    border-radius: 6px;
+    color: white;
+    margin: 15px;
+    font-weight: 600;
+}
+.sidebar .logout:hover {
+    background-color: #c9302c;
+}
+
+/* 📦 Khu nội dung */
+.content {
+    margin-left: 240px;
+    padding: 30px;
+    width: calc(100% - 240px);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+/* 🎓 Trang chào mừng */
+.welcome {
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 50px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.welcome h2 {
+    font-weight: 700;
+    color: #004080;
+}
+.welcome p {
+    color: #555;
+}
+
+/* 📊 Bảng dữ liệu */
+.table {
+    background: white;
     border-radius: 10px;
     overflow: hidden;
-    background-color: #fff;
 }
-
-/* 🌈 Tiêu đề bảng */
-.table-primary th {
-    background-color: #007bff !important;
+.table thead {
+    background-color: #0056A1;
     color: white;
 }
-
-/* ✨ Hiệu ứng hover */
-table tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);
+.table tr:hover {
+    background-color: rgba(13,110,253,0.08);
     transition: 0.3s;
+}
+
+/* 🔍 Form tìm kiếm */
+form .form-label {
+    font-weight: 600;
+}
+
+/* 📍 Footer */
+footer {
+    text-align: center;
+    color: #666;
+    padding: 20px 0;
+    font-size: 14px;
 }
