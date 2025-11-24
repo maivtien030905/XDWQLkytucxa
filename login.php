@@ -2,6 +2,10 @@
 session_start();
 include 'db.php';
 
+// Hiển thị lỗi để tránh trắng trang
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Kiểm tra khi người dùng nhấn nút Đăng nhập
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
@@ -12,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
-        die("❌ Lỗi SQL: " . $conn->error);
+        die("❌ Lỗi SQL prepare(): " . $conn->error);
     }
 
     $stmt->bind_param("s", $username);
@@ -23,20 +27,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
-        // So sánh mật khẩu (ở đây chưa mã hóa)
+        // So sánh mật khẩu (chưa mã hóa)
         if ($password == $row['password']) {
+
+            // 🔥 Lưu thông tin Session
             $_SESSION['username'] = $row['username'];
+            $_SESSION['role'] = $row['role'];  // <-- QUAN TRỌNG: phân quyền
+
+            // ✨ Chuyển hướng sau khi đăng nhập
             header("Location: index.php");
             exit();
         } else {
             $error = "❌ Sai mật khẩu!";
         }
+    } 
+    if ($password == $row['password']) {
+
+    $_SESSION['username'] = $row['username'];
+    $_SESSION['role'] = $row['role'];
+
+    // Chuyển hướng theo role
+    if ($row['role'] == 'admin') {
+        header("Location: index.php");
     } else {
+        header("Location: sinhvien_home.php");
+    }
+    exit();
+}
+    else {
         $error = "❌ Tài khoản không tồn tại!";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -44,7 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Đăng nhập hệ thống</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body class="bg-light">
 
@@ -67,6 +88,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        <div class="text-center mt-3">
+    <a href="register.php">Chưa có tài khoản? Đăng ký</a>
+</div>
     </form>
 </div>
 </body>

@@ -1,4 +1,4 @@
-/* 🌈 Font và nền */
+/* 🌈 Font & nền tổng thể */
 body {
     font-family: 'Inter', sans-serif;
     background: url('uploads/background.png') no-repeat center center fixed;
@@ -6,76 +6,76 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    display: flex;
 }
 
 /* 🌫️ Lớp phủ mờ */
 body::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255,255,255,0.75);
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.75);
     z-index: -1;
 }
 
-/* 📐 Layout tổng thể */
+/* 📐 Layout chính */
 .layout {
     display: flex;
-    height: 100vh;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-/* 🧭 Sidebar cố định bên trái */
+/* 🧭 Sidebar trái cố định */
 .sidebar {
     width: 240px;
+    flex-shrink: 0;
     background-color: #0056A1;
     color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    transition: all 0.3s ease-in-out;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
 }
 
-/* 🏫 Logo */
+/* 🏫 Logo / tiêu đề sidebar */
 .sidebar h3 {
     text-align: center;
     font-weight: 700;
     margin: 20px 0;
+    font-size: 1.4rem;
 }
 
-/* 🔗 Menu chức năng */
+/* 🔗 Menu trong sidebar */
 .sidebar ul {
     list-style: none;
-    padding: 0;
+    padding: 0 10px;
     margin: 0;
+    flex: 1;
+    overflow-y: auto;
 }
+
 .sidebar ul li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
+
 .sidebar ul li a {
-    display: flex;
-    align-items: center;
+    display: block;
     color: white;
     text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 12px 18px;
+    border-radius: 8px;
     font-weight: 500;
-    transition: all 0.25s ease;
+    transition: background 0.25s, transform 0.2s;
 }
+
 .sidebar ul li a:hover,
 .sidebar ul li a.active {
     background-color: #004080;
-    transform: translateX(5px);
-}
-.sidebar ul li a span.icon {
-    margin-right: 10px;
-    font-size: 18px;
+    transform: translateX(4px);
 }
 
 /* 🚪 Nút đăng xuất */
@@ -83,30 +83,33 @@ body::before {
     background-color: #d9534f;
     text-align: center;
     padding: 12px;
+    margin: 15px;
     border-radius: 6px;
     color: white;
-    margin: 15px;
     font-weight: 600;
+    transition: background 0.3s;
 }
+
 .sidebar .logout:hover {
     background-color: #c9302c;
 }
 
-/* 📦 Khu nội dung */
+/* 📦 Nội dung chính */
 .content {
     margin-left: 240px;
-    padding: 30px;
-    width: calc(100% - 240px);
+    flex: 1;
+    padding: 40px 50px;
+    background: rgba(255, 255, 255, 0.9);
     overflow-y: auto;
-    transition: all 0.3s ease;
+    transition: margin-left 0.3s;
 }
 
 /* 🎓 Trang chào mừng */
 .welcome {
-    background: rgba(255,255,255,0.95);
+    background: #fff;
     border-radius: 12px;
-    padding: 50px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    padding: 50px 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 .welcome h2 {
@@ -122,13 +125,14 @@ body::before {
     background: white;
     border-radius: 10px;
     overflow: hidden;
+    margin-top: 20px;
 }
 .table thead {
     background-color: #0056A1;
     color: white;
 }
 .table tr:hover {
-    background-color: rgba(13,110,253,0.08);
+    background-color: rgba(13, 110, 253, 0.08);
     transition: 0.3s;
 }
 
@@ -143,4 +147,28 @@ footer {
     color: #666;
     padding: 20px 0;
     font-size: 14px;
+}
+
+/* 📱 Responsive cho màn hình nhỏ */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 200px;
+    }
+    .content {
+        margin-left: 200px;
+        padding: 25px;
+    }
+}
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
 }

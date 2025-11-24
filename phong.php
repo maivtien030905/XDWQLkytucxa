@@ -58,6 +58,11 @@ $result = $conn->query($sql);
             <button type="submit" class="btn btn-primary me-2">🔍 Tìm kiếm</button>
             <button type="button" class="btn btn-outline-secondary" onclick="loadPage('phong.php')">🧹 Làm mới</button>
         </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold text-primary mb-0">📋 Danh sách phòng</h4>
+    <button class="btn btn-success" onclick="loadPage('diennuoc_them.php')">⚡ Thêm chỉ số điện nước</button>
+</div>
+
     </form>
 
     <!-- Bảng dữ liệu -->

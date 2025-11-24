@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include 'db.php';
 
 // Xử lý tìm kiếm theo tháng, năm hoặc phòng
 $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';

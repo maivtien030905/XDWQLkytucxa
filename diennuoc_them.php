@@ -1,140 +1,115 @@
 <?php
-include 'config.php';
+include 'db.php';
 
 // Lấy danh sách phòng
-$phong_query = "SELECT id, tenphong FROM phong";
-$phong_result = mysqli_query($conn, $phong_query);
+$phong_result = $conn->query("SELECT id, tenphong FROM phong");
 
-// Khi nhấn Lưu
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $phongid = $_POST['phongid'];
-    $thang = $_POST['thang'];
-    $nam = $_POST['nam'];
-    $chisodiencu = $_POST['chisodiencu'];
-    $chisodienmoi = $_POST['chisodienmoi'];
-    $chisonuoccu = $_POST['chisonuoccu'];
-    $chisonuocmoi = $_POST['chisonuocmoi'];
-    $ghichu = $_POST['ghichu'];
+// Lấy giá điện nước mới nhất
+$gia_query = "SELECT giadien, gianuoc FROM giadichvu ORDER BY ngayapdung DESC LIMIT 1";
+$gia_result = $conn->query($gia_query);
+$gia = $gia_result->fetch_assoc();
+$giadien = $gia ? $gia['giadien'] : 0;
+$gianuoc = $gia ? $gia['gianuoc'] : 0;
 
-    $tieuthu_dien = $chisodienmoi - $chisodiencu;
-    $tieuthu_nuoc = $chisonuocmoi - $chisonuoccu;
+$success = $error = "";
 
-    // Lấy giá mới nhất
-    $gia_query = "SELECT gia_dien, gia_nuoc FROM giadichvu ORDER BY ngayapdung DESC LIMIT 1";
-    $gia_result = mysqli_query($conn, $gia_query);
-    $gia = mysqli_fetch_assoc($gia_result);
+// Xử lý form
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $phongid = $_POST['phongid'] ?? null;
+    $thang = $_POST['thang'] ?? null;
+    $nam = $_POST['nam'] ?? null;
+    $chisodiencu = $_POST['chisodiencu'] ?? null;
+    $chisodienmoi = $_POST['chisodienmoi'] ?? null;
+    $chisonuoccu = $_POST['chisonuoccu'] ?? null;
+    $chisonuocmoi = $_POST['chisonuocmoi'] ?? null;
+    $ngaycapnhat = date('Y-m-d');
 
-    $tiendien = $tieuthu_dien * $gia['gia_dien'];
-    $tiennuoc = $tieuthu_nuoc * $gia['gia_nuoc'];
-    $tongtien = $tiendien + $tiennuoc;
+    if ($phongid && $chisodienmoi >= $chisodiencu && $chisonuocmoi >= $chisonuoccu) {
+        $sql = "INSERT INTO diennuoc (phongid, thang, nam, chisodiencu, chisodienmoi, chisonuoccu, chisonuocmoi, ngaycapnhat)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
 
-    // Lưu vào bảng diennuoc
-    $sql_diennuoc = "INSERT INTO diennuoc (phongid, thang, nam, chisodiencu, chisodienmoi, chisonuoccu, chisonuocmoi, ngaycapnhat, ghichu)
-                     VALUES ('$phongid', '$thang', '$nam', '$chisodiencu', '$chisodienmoi', '$chisonuoccu', '$chisonuocmoi', NOW(), '$ghichu')";
-    mysqli_query($conn, $sql_diennuoc);
-
-    // Lấy id diennuoc vừa tạo
-    $diennuoc_id = mysqli_insert_id($conn);
-
-    // Lưu vào bảng hoadon
-    $sql_hoadon = "INSERT INTO hoadon (diennuocid, phongid, thang, nam, tiendien, tiennuoc, tongtien, trangthai)
-                   VALUES ('$diennuoc_id', '$phongid', '$thang', '$nam', '$tiendien', '$tiennuoc', '$tongtien', 'Chưa thanh toán')";
-    mysqli_query($conn, $sql_hoadon);
-
-    echo "<script>alert('Đã lưu thành công chỉ số điện nước!'); window.location='diennuoc_them.php';</script>";
+        if ($stmt) {
+            $stmt->bind_param("iiiiiiis", $phongid, $thang, $nam, $chisodiencu, $chisodienmoi, $chisonuoccu, $chisonuocmoi, $ngaycapnhat);
+            if ($stmt->execute()) {
+                $success = "✅ Thêm chỉ số điện nước thành công!";
+            } else {
+                $error = "❌ Lỗi khi thêm dữ liệu: " . $stmt->error;
+            }
+            $stmt->close();
+        } else {
+            $error = "❌ Lỗi prepare: " . $conn->error;
+        }
+    } else {
+        $error = "⚠️ Vui lòng nhập dữ liệu hợp lệ (chỉ số mới ≥ chỉ số cũ)!";
+    }
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<title>Nhập chỉ số điện nước</title>
-<style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(to right, #89f7fe, #66a6ff);
-        margin: 0;
-        padding: 0;
-    }
-    .container {
-        max-width: 700px;
-        margin: 50px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 20px;
-    }
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    input, select, textarea {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 15px;
-    }
-    button {
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    button:hover {
-        background: #0056b3;
-    }
-</style>
-</head>
-<body>
-<div class="container">
-    <h2>Nhập chỉ số điện nước</h2>
-    <form method="POST">
-        <label>Phòng:</label>
-        <select name="phongid" required>
-            <option value="">-- Chọn phòng --</option>
-            <?php while($row = mysqli_fetch_assoc($phong_result)) { ?>
-                <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['tenphong']) ?></option>
-            <?php } ?>
-        </select>
+<div class="content-box">
+    <h4 class="fw-bold text-primary mb-3">⚡ Thêm chỉ số điện nước</h4>
 
-        <label>Tháng:</label>
-        <input type="number" name="thang" min="1" max="12" required>
+    <?php if ($success): ?>
+        <div class="alert alert-success"><?= $success ?></div>
+    <?php elseif ($error): ?>
+        <div class="alert alert-danger"><?= $error ?></div>
+    <?php endif; ?>
 
-        <label>Năm:</label>
-        <input type="number" name="nam" value="<?= date('Y') ?>" required>
+    <form method="POST" class="row g-3">
 
-        <label>Chỉ số điện cũ:</label>
-        <input type="number" name="chisodiencu" required>
+        <div class="col-md-6">
+            <label class="form-label">Phòng</label>
+            <select name="phongid" class="form-select" required>
+                <option value="">-- Chọn phòng --</option>
+                <?php while ($row = $phong_result->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['tenphong']) ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
 
-        <label>Chỉ số điện mới:</label>
-        <input type="number" name="chisodienmoi" required>
+        <div class="col-md-3">
+            <label class="form-label">Tháng</label>
+            <input type="number" name="thang" min="1" max="12" class="form-control" required>
+        </div>
 
-        <label>Chỉ số nước cũ:</label>
-        <input type="number" name="chisonuoccu" required>
+        <div class="col-md-3">
+            <label class="form-label">Năm</label>
+            <input type="number" name="nam" min="2000" value="<?= date('Y') ?>" class="form-control" required>
+        </div>
 
-        <label>Chỉ số nước mới:</label>
-        <input type="number" name="chisonuocmoi" required>
+        <div class="col-md-3">
+            <label class="form-label">Chỉ số điện cũ</label>
+            <input type="number" name="chisodiencu" class="form-control" required>
+        </div>
 
-        <label>Ghi chú:</label>
-        <textarea name="ghichu" rows="3"></textarea>
+        <div class="col-md-3">
+            <label class="form-label">Chỉ số điện mới</label>
+            <input type="number" name="chisodienmoi" class="form-control" required>
+        </div>
 
-        <button type="submit">💾 Lưu chỉ số</button>
+        <div class="col-md-3">
+            <label class="form-label">Chỉ số nước cũ</label>
+            <input type="number" name="chisonuoccu" class="form-control" required>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Chỉ số nước mới</label>
+            <input type="number" name="chisonuocmoi" class="form-control" required>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Giá điện hiện tại (VNĐ/kWh)</label>
+            <input type="text" class="form-control" value="<?= number_format($giadien, 0, ',', '.') ?>" readonly>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Giá nước hiện tại (VNĐ/m³)</label>
+            <input type="text" class="form-control" value="<?= number_format($gianuoc, 0, ',', '.') ?>" readonly>
+        </div>
+
+        <div class="col-12 text-center mt-3">
+            <button type="submit" class="btn btn-primary">💾 Thêm mới</button>
+            <button type="button" class="btn btn-secondary" onclick="loadPage('diennuoc_danhsach.php')">↩️ Quay lại</button>
+        </div>
     </form>
 </div>
-</body>
-</html>
